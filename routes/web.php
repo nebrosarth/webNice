@@ -15,10 +15,13 @@ use App\Models\Character;
 */
 
 Route::get('/', function () {
-    return redirect('/main');
+    return redirect('/characters');
     return view('welcome');
 });
 
-Route::get('/main', [CharacterController::class, 'index']);
-Route::get('/main/{id}/edit', [CharacterController::class, 'edit']);
-Route::get('/main/{character}', [CharacterController::class, 'show']);
+//Route::get('/characters', [CharacterController::class, 'index']);
+//Route::post('/characters/{id}/edit', [CharacterController::class, 'store']);
+//Route::get('/characters/{id}/edit', [CharacterController::class, 'edit']);
+//Route::get('/characters/{character}', [CharacterController::class, 'show']);
+
+Route::resource('characters', CharacterController::class);

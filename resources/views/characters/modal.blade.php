@@ -6,5 +6,11 @@
     <p>{{$character->description2}}</p>
 </div>
 <div class="modal-footer">
+    <a type="button" class="btn btn-primary" role="button" href="characters/{{$character->id}}/edit">Редактировать</a>
+    <form action="/characters/{{$character->id}}" method="post">
+        @method('DELETE')
+        @csrf
+        <button class="btn btn-primary" role="button" >Удалить</button>
+    </form>
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
 </div>

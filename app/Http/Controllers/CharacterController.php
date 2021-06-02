@@ -23,9 +23,9 @@ class CharacterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Character $character)
     {
-        //
+        return view('characters.create', compact(['character']));
     }
 
     /**
@@ -36,7 +36,28 @@ class CharacterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'name2' => 'required',
+            'description2' => 'required',
+            'image_url' => 'required',
+            'date1' => 'required',
+        ]);
+        Character::create($data);
+        return redirect('/characters');
+//        $path = $request->File('image_url')->store('public/character_images');
+//        $data["image_url"] = $path;
+//        $img = Image::make(Storage::path($path))->resize(300, 200)->encode('jpg', 85);
+//        $img->Save(Storage::path($path)."thumb.jpg");
+//        Character::Create($data);
+//        $character = new Character();
+//        $character->name = request('name');
+//        $character->name2 = request('name2');
+//        $character->description = request('description');
+//        $character->description2 = request('description2');
+//        $character->save();
+//        return redirect()->back();
     }
 
     /**
@@ -58,7 +79,7 @@ class CharacterController extends Controller
      */
     public function edit(Character $character)
     {
-        //
+        return view('characters.edit', compact(['character']));
     }
 
     /**
@@ -68,9 +89,18 @@ class CharacterController extends Controller
      * @param  \App\Models\Character  $character
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Character $character)
+    public function update(Character $character)
     {
-        //
+        $data = request()->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'name2' => 'required',
+            'description2' => 'required',
+            'image_url' => 'required',
+            'date1' => 'required',
+        ]);
+        $character->update($data);
+        return redirect('/characters');
     }
 
     /**
@@ -81,6 +111,9 @@ class CharacterController extends Controller
      */
     public function destroy(Character $character)
     {
-        //
+        $character->delete();
+
+        return redirect()->route('characters.index')
+            ->with('success', 'Project deleted successfully');
     }
 }

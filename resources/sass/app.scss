@@ -1,0 +1,117 @@
+$background-color: grey;
+$primary-color: black;
+@mixin inverted {
+    $background-color: $primary-color;
+    $primary-color: $background-color;
+}
+
+$grid-breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px,
+    ultrawide: 1600px
+);
+$container-max-widths: (
+    sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1320px,
+    ultrawide: 1560px
+);
+
+.main {
+    margin: auto;
+    @include inverted;
+
+    .logo {
+        width: 100px;
+        height: auto;
+    }
+
+    .middle {
+        width: 760px;
+        margin: auto;
+
+        .label {
+            position: relative;
+            top: -3px;
+            left: 10px;
+            width: 40%;
+            margin: -0px;
+        }
+    }
+}
+.object {
+    width: 33%;
+}
+
+.objects {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.col {
+    min-width: 221.99px;
+}
+
+@for $i from 1 through 5 {
+    .middle > .objects > .object:nth-child(5n + #{$i}) {
+        background-color: hsl($i * 70, 100, 90);
+    }
+}
+
+.loadicon {
+    animation: rotation 2s infinite linear;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.toast-body {
+    background-color: white;
+}
+
+footer {
+    color: green;
+
+    .icons {
+        margin-left: 300px;
+        .icon {
+            height: 30px;
+        }
+    }
+}
+
+header, footer {
+    display: flex;
+    color: $primary-color;
+    width: auto;
+    height: 40px;
+    text-align: left;
+    justify-content: space-around;
+    align-items: center;
+
+    .button {
+        background-color: #4caf50; /* Green */
+        border: none;
+        color: white;
+        padding: 10px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 15px;
+        cursor: pointer;
+
+    }
+}
