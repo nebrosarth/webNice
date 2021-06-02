@@ -3,7 +3,8 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+            crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 
@@ -32,18 +33,19 @@
         <div class="objects">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
                 @foreach($characters as $c)
-                <div class="col">
-                    <div class="card" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-num={{$c->id-1}}>
-                        <h4 class="label">{{$c->name}}</h4>
-                        <div class="photo-block">
-                            <img alt="logo"
-                                 class="card-img-top img-fluid"
-                                 src="{{$c->image_url}}">
-                            <h4 class="card-title">{{$c->name2}}</h4>
-                            <div class="card-text">{{$c->description}}</div>
+                    <div class="col">
+                        <div class="card" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                             data-bs-num={{$c->id}}>
+                            <h4 class="label">{{$c->name}}</h4>
+                            <div class="photo-block">
+                                <img alt="logo"
+                                     class="card-img-top img-fluid"
+                                     src="{{$c->image_url}}">
+                                <h4 class="card-title">{{$c->name2}}</h4>
+                                <div class="card-text">{{$c->description}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endforeach
             </div>
         </div>
@@ -51,17 +53,7 @@
     <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="exampleModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Описание</h5>
-                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-                </div>
-                <div class="modal-body">
-                    <p tabindex="0" data-bs-toggle="popover" data-bs-trigger="focus" title="Подсказка"
-                       data-bs-content="Работает">Modal body text.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                </div>
+
             </div>
         </div>
     </div>
@@ -85,7 +77,7 @@
 
     </footer>
 
-    <div class="toast"  role="alert" aria-live="assertive" aria-atomic="false">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="false">
         <div class="position-fixed top-0 end-0">
             <div class="toast-header">
                 <div class="loadicon">
@@ -110,9 +102,14 @@
         "Венди (Wendy) — у Венди есть особенный цветок, с помощью которого она может призвать свою призрачную сестру Абигейл. Призрак будет помогать довольно слабой Венди в бою. У Венди крепкие нервы, поэтому темнота и монстры меньше снижают ее рассудок. Голос Венди — альтовая флейта.",
         "WX-78 — может съесть несвежие и испорченные продукты без вреда здоровью и штрафа к сытости (но получает штрафы от гнили). Может есть шестерёнки для повышения характеристик. Получает урон под дождём и искрится. Если в него ударит молния (в том числе от Посоха телелокации), он мгновенно восстановит здоровье и ускорится, но потеряет часть рассудка. Его голос похож на синтезатор."]
     modalCount = modalText.length
+    let ids = [
+        @foreach($characters as $c)
+            {{$c->id}},
+        @endforeach
+    ]
     var exampleModal = document.getElementById('exampleModal')
 
-    function showInfo(i) {
+    function showInfoq(i) {
         currentModel = i;
         var modalParagraph = exampleModal.querySelector('.modal-body p')
         text = modalText[i];
@@ -133,6 +130,21 @@
 
 
     })
+
+    function showInfo(i) {
+        i = (i + modalCount) % modalCount;
+        var modalParagraph = exampleModal.querySelector('.modal-content');
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                modalParagraph.innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", `characters/${i}`, true);
+        xhttp.send();
+        currentModal = i;
+    }
+
     exampleModal.addEventListener("keydown", event => {
         if (event.isComposing || event.key === "ArrowLeft") {
             showInfo(currentModel > 0 ? currentModel - 1 : 0)

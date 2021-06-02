@@ -15,9 +15,10 @@ use App\Models\Character;
 */
 
 Route::get('/', function () {
+    return redirect('/main');
     return view('welcome');
 });
 
 Route::get('/main', [CharacterController::class, 'index']);
 Route::get('/main/{id}/edit', [CharacterController::class, 'edit']);
-Route::get('/main/{id}', [CharacterController::class, 'show']);
+Route::get('/main/{character}', [CharacterController::class, 'show']);
