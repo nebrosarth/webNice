@@ -2,24 +2,28 @@
 
 @section('content')
     <div class="main">
-        <ul class="nav bg-secondary nav-pills nav-fill">
-            <li class="nav-item">
-                <img class="img-fluid"
-                     src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png">
-            </li>
-            <li class="nav-item">
-                <h4 class="nav-link" href="#">Don't Starve Together fandom</h4>
-            </li>
-            <li class="nav-item">
-                <a type="button" role="button" class="btn btn-primary" href="/characters/create">Добавить</a>
-            </li>
-
-        </ul>
         <div class="middle">
-            <h1>Персонажи Don't Starve Together</h1>
+            <h1>Персонажи Don't Starve Together
+                @if (! is_null($user))
+                    @if ($feed)
+                        (для друзей пользователя {{$user->name}})
+                    @else
+                        (для пользователя {{$user->name}})
+                    @endif
+                @endif</h1>
+            @if (Auth::check())
+                <li class="nav-item">
+                    <a type="button" role="button" class="btn btn-primary" href="/characters/create">Добавить</a>
+                </li>
+            @else
+                <li class="nav-item">
+                    <a type="button" role="button" class="btn btn-primary disabled">Добавить</a>
+                </li>
+            @endif
             <div class="objects">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
                     @foreach($characters as $c)
+                        @if (!$c->trashed() || (Auth::user()->is_admin ?? null))
                         <div class="col">
                             <div class="card" data-bs-toggle="modal" data-bs-target="#exampleModal"
                                  data-bs-num={{$c->id}}>
@@ -31,8 +35,25 @@
                                     <h4 class="card-title">{{$c->name2}}</h4>
                                     <div class="card-text">{{$c->description}}</div>
                                 </div>
+                                @if(Auth::user()->is_admin ?? null)
+                                    <div class="flex">
+                                        <form action="{{route('characters.restore', $c->id)}}" method="post">
+                                            @csrf
+                                            <input type="text" hidden name="return_url" value="{{Request::url()}}">
+                                            <input class="btn btn-success m-2" type="submit" name="restore"
+                                                   value="Восстановить"/>
+                                        </form>
+                                        <form action="{{route('characters.purge', $c->id)}}" method="post">
+                                            @csrf
+                                            <input type="text" hidden name="return_url" value="{{Request::url()}}">
+                                            <input class="btn btn-danger m-2" type="submit" name="purge"
+                                                   value="Удалить"/>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                         </div>
+                    @endif
                     @endforeach
                 </div>
             </div>
@@ -110,7 +131,7 @@
                     modalParagraph.innerHTML = this.responseText;
                 }
             };
-            xhttp.open("GET", `characters/${i}`, true);
+            xhttp.open("GET", `/characters/${i}`, true);
             xhttp.send();
             currentModal = i;
         }
@@ -122,17 +143,5 @@
                 showInfo(currentModel < modalCount ? Number(currentModel) + 1 : modalCount)
             }
         })
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-        var fNotImplError = toastList[0];
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-            return new Popover(popoverTriggerEl)
-        });
-
-        var popover = new bootstrap.Popover(document.querySelector('.popover-dismiss'), {
-            trigger: 'focus'
-        })
     </script>
+@endsection

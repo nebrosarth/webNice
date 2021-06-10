@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CharacterController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Character;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,13 +17,29 @@ use App\Models\Character;
 */
 
 Route::get('/', function () {
-    return redirect('/characters');
     return view('welcome');
 });
 
-//Route::get('/characters', [CharacterController::class, 'index']);
-//Route::post('/characters/{id}/edit', [CharacterController::class, 'store']);
-//Route::get('/characters/{id}/edit', [CharacterController::class, 'edit']);
-//Route::get('/characters/{character}', [CharacterController::class, 'show']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::resource('characters', CharacterController::class);
+require __DIR__.'/auth.php';
+Route::get('/users/{user:name}/characters', [CharacterController::class, 'index'])->name('users.characters');
+Route::get('/users/{user:name}/feed', [UserController::class, 'feed'])->name('users.feed');
+
+Route::post('/users/{user:name}/befriend', [UserController::class, 'befriend'])->name('users.befriend');
+Route::post('/users/{user:name}/unfriend', [UserController::class, 'unfriend'])->name('users.unfriend');
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+Route::post('/characters/{id}/restore', [CharacterController::class, 'restore'])->name('characters.restore')->middleware(['auth']);
+Route::post('/characters/{id}/purge', [CharacterController::class, 'purge'])->name('characters.purge')->middleware(['auth']);
+
+Route::get('/characters/{character}/items', [ItemController::class, 'index'])
+    ->name('items.index');
+Route::get('/characters/{character}/items/create', [ItemController::class, 'create'])
+    ->name('items.create');
+Route::post('/characters/{character}/items', [ItemController::class, 'store'])
+    ->name('items.store');

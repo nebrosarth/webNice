@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Character;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CharacterController extends Controller
 {
@@ -12,10 +15,18 @@ class CharacterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(User $user = null)
     {
-        $characters = Character::all();
-        return view('characters.index', compact(['characters']));
+        if(is_null($user))
+        {
+            $characters = Character::withTrashed()->get();
+        }
+        else
+        {
+            $characters = $user->characters()->get();
+        }
+        $feed = false;
+        return view('characters.index', compact(['characters', 'user', 'feed']));
     }
 
     /**
@@ -25,6 +36,10 @@ class CharacterController extends Controller
      */
     public function create(Character $character)
     {
+        if(!Auth::check())
+        {
+            abort(401, "Authentication required");
+        }
         return view('characters.create', compact(['character']));
     }
 
@@ -36,6 +51,10 @@ class CharacterController extends Controller
      */
     public function store(Request $request)
     {
+        if(!Auth::check())
+        {
+            abort(401, "Authentication required");
+        }
         $data = $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -79,6 +98,10 @@ class CharacterController extends Controller
      */
     public function edit(Character $character)
     {
+        if(!Gate::allows('modify-object', $character))
+        {
+            abort(403, "Unauthorized");
+        }
         return view('characters.edit', compact(['character']));
     }
 
@@ -91,6 +114,10 @@ class CharacterController extends Controller
      */
     public function update(Character $character)
     {
+        if(!Gate::allows('modify-object', $character))
+        {
+            abort(403, "Unauthorized");
+        }
         $data = request()->validate([
             'name' => 'required',
             'description' => 'required',
@@ -115,5 +142,24 @@ class CharacterController extends Controller
 
         return redirect()->route('characters.index')
             ->with('success', 'Project deleted successfully');
+    }
+    public function purge(Request $request, int $id)
+    {
+        if(!Auth::user()->is_admin) {
+            abort(403, "Unauthorized");
+        }
+        Character::withTrashed()->find($id)->forceDelete();
+
+        return redirect($request['return_url'])
+            ->with('success', 'Объект успешно удалён.');
+    }
+    public function restore(Request $request, int $id)
+    {
+        if(!Auth::user()->is_admin) {
+            abort(403, "Unauthorized");
+        }
+        Character::withTrashed()->find($id)->restore();
+        return redirect($request['return_url'])
+            ->with('success', 'Объект восстановлен.');
     }
 }
