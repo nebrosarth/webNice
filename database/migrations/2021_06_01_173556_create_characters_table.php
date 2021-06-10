@@ -22,6 +22,7 @@ class CreateCharactersTable extends Migration
             $table->string('image_url', 255);
             $table->dateTime('date1');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
